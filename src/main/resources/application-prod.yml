@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://43.139.117.223:3306/movies
+    username: root
+    password: 3476.Zz
+    hikari:
+      maximum-pool-size: 500

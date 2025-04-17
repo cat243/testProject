@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yupi.project.mapper.BookingMapper">
+
+    <resultMap id="BaseResultMap" type="com.yupi.project.model.entity.Booking">
+            <id property="movie_id" column="movie_id" jdbcType="VARCHAR"/>
+            <id property="seat_number" column="seat_number" jdbcType="VARCHAR"/>
+            <result property="time_slot" column="time_slot" jdbcType="VARCHAR"/>
+            <result property="username" column="username" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        movie_id,seat_number,time_slot,
+        username
+    </sql>
+</mapper>
