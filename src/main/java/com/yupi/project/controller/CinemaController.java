@@ -2,6 +2,7 @@ package com.yupi.project.controller;
 
 
 import com.yupi.project.common.BaseResponse;
+import com.yupi.project.common.ErrorCode;
 import com.yupi.project.common.ResultUtils;
 import com.yupi.project.model.dto.cinema.MoviesVO;
 import com.yupi.project.model.dto.cinema.cinemaVO;
@@ -68,5 +69,73 @@ public class CinemaController {
         }
         return vos;
     }
+
+
+
+    /**
+     * 根据影院 ID 获取影院详细信息
+     * @param cinemaId 影院 ID
+     * @return 影院详细信息
+     */
+    @GetMapping("/detail")
+    BaseResponse<cinemaVO> getCinemaById(@RequestParam("cinemaId") Long cinemaId){
+        Cinema cinema = this.cinemaService.getById(cinemaId);
+        if (cinema == null) {
+            return ResultUtils.error(ErrorCode.NOT_FOUND_ERROR,"影院未找到");
+        }
+        cinemaVO vo = new cinemaVO();
+        BeanUtils.copyProperties(cinema, vo);
+        vo.setMoviesVOS(listMoviesInfoByCinemaName(cinema.getName()));
+        return ResultUtils.success(vo);
+    }
+
+
+
+    /**
+     * 获取所有影院数据，支持分页
+     * @param page 页码
+     * @param size 每页条数
+     * @return 影院列表
+     */
+    @GetMapping("/listPaged")
+    BaseResponse<List<cinemaVO>> listCinemaPaged(@RequestParam("page") int page, @RequestParam("size") int size) {
+        List<Cinema> list = this.cinemaService.lambdaQuery()
+                .orderByAsc(Cinema::getId)  // 按照 ID 排序
+                .last("LIMIT " + (page - 1) * size + "," + size)
+                .list();
+
+        if (list.isEmpty()) {
+            return ResultUtils.error(ErrorCode.NOT_FOUND_ERROR,"未找到影院信息");
+        }
+
+        List<cinemaVO> cinemaVOS = list.stream()
+                .map(cinema -> {
+                    cinemaVO vo = new cinemaVO();
+                    BeanUtils.copyProperties(cinema, vo);
+                    vo.setMoviesVOS(listMoviesInfoByCinemaName(cinema.getName()));
+                    return vo;
+                })
+                .collect(Collectors.toList());
+
+        return ResultUtils.success(cinemaVOS);
+    }
+
+
+    /**
+     * 删除影院
+     * @param cinemaId 影院 ID
+     * @return 删除结果
+     */
+    @GetMapping("/delete")
+    BaseResponse<String> deleteCinema(@RequestParam("cinemaId") Long cinemaId) {
+        boolean removed = this.cinemaService.removeById(cinemaId);
+        if (!removed) {
+            return ResultUtils.error(ErrorCode.NOT_FOUND_ERROR,"删除失败，未找到影院");
+        }
+        return ResultUtils.success("影院删除成功");
+    }
+
+
+
 
 }
